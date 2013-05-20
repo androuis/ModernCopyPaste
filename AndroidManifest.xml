@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.moderncopypaste"
+    package="com.andreibacalu.android.moderncopypaste"
     android:versionCode="1"
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="16"
         android:targetSdkVersion="16" />
 
     <application
-        android:allowBackup="true"
+        android:allowClearUserData="false"
+        
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.moderncopypaste.MainActivity"
+            android:name="com.andreibacalu.android.moderncopypaste.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,9 +23,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+<<<<<<< HEAD
         <activity android:name="com.example.moderncopypaste.NotificationHandler"></activity>
         <service android:name=".services.ChangeNotificationTextService"></service>
         <receiver android:name=".receivers.ChangeNotificationTextBroadcastReceiver"></receiver>
+=======
+        <activity 
+            android:noHistory="true" 
+            android:name="com.andreibacalu.android.moderncopypaste.Activity2" 
+            android:excludeFromRecents="true">
+        </activity>
+        
+>>>>>>> 932eb18827e3e98e75aaba7f1ff1c9c212c8c0a8
     </application>
 
 </manifest>
