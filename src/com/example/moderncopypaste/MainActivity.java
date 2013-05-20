@@ -1,11 +1,14 @@
 package com.example.moderncopypaste;
 
+import com.example.moderncopypaste.services.ChangeNotificationTextService;
+
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,7 +28,8 @@ public class MainActivity extends Activity {
 		textView.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
-				addNotification();
+				//addNotification();
+				getBaseContext().startService(new Intent(getBaseContext(), ChangeNotificationTextService.class));
 			}
 		});
 	}
@@ -45,7 +49,7 @@ public class MainActivity extends Activity {
 		// Prepare intent which is triggered if the
 		// notification is selected
 
-		Intent intent = new Intent(this, Activity2.class);
+		Intent intent = new Intent(this, NotificationHandler.class);
 		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 		
 		RemoteViews rv = new RemoteViews(getPackageName(), R.layout.notification_layout);
@@ -53,12 +57,12 @@ public class MainActivity extends Activity {
 
 		// Build notification
 		// Actions are just fake
-		Notification noti = new Notification.Builder(this)
+		Notification noti = new NotificationCompat.Builder(this)
 			.setContent(rv)
-			.setSmallIcon(R.drawable.ic_launcher)
-			.addAction(R.drawable.ic_launcher, "1", pIntent)
-			.addAction(R.drawable.ic_launcher, "1", pIntent)			
+			.setSmallIcon(R.drawable.ic_launcher)	
 			.build();
+		
+		rv.setOnClickPendingIntent(R.id.text_previous, pIntent);
 		  
 		NotificationManager notificationManager = 
 		  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

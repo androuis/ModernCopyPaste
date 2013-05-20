@@ -22,6 +22,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.example.moderncopypaste.NotificationHandler"></activity>
+        <service android:name=".services.ChangeNotificationTextService"></service>
+        <receiver android:name=".receivers.ChangeNotificationTextBroadcastReceiver"></receiver>
     </application>
 
 </manifest>
