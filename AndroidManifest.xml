@@ -5,12 +5,12 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="16"
+        android:minSdkVersion="14"
         android:targetSdkVersion="16" />
 
     <application
         android:allowClearUserData="false"
-        
+        android:debuggable="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -19,22 +19,12 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<<<<<<< HEAD
-        <activity android:name="com.example.moderncopypaste.NotificationHandler"></activity>
-        <service android:name=".services.ChangeNotificationTextService"></service>
-        <receiver android:name=".receivers.ChangeNotificationTextBroadcastReceiver"></receiver>
-=======
-        <activity 
-            android:noHistory="true" 
-            android:name="com.andreibacalu.android.moderncopypaste.Activity2" 
-            android:excludeFromRecents="true">
-        </activity>
-        
->>>>>>> 932eb18827e3e98e75aaba7f1ff1c9c212c8c0a8
+        <activity android:name="com.andreibacalu.android.moderncopypaste.NotificationHandler"></activity>
+        <service android:name="com.andreibacalu.android.moderncopypaste.services.ChangeNotificationTextService"></service>
+        <receiver android:name="com.andreibacalu.android.moderncopypaste.receivers.ChangeNotificationTextBroadcastReceiver"></receiver>
     </application>
 
 </manifest>

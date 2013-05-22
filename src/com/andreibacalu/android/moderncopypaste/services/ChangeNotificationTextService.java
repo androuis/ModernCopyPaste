@@ -1,16 +1,18 @@
-package com.example.moderncopypaste.services;
-
-import com.example.moderncopypaste.R;
-import com.example.moderncopypaste.receivers.ChangeNotificationTextBroadcastReceiver;
+package com.andreibacalu.android.moderncopypaste.services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.RemoteViews;
+
+import com.andreibacalu.android.moderncopypaste.R;
 
 public class ChangeNotificationTextService extends Service {
 	
@@ -18,6 +20,7 @@ public class ChangeNotificationTextService extends Service {
 	private static final int INTENT_COMMAND_TYPE_PREVIOUS = -1;	
 	private static final int INTENT_COMMAND_TYPE_NEXT = 1;	
 	private static final int INTENT_COMMAND_TYPE_USE = 0;
+	private ClipboardManager clipBoard;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -28,6 +31,8 @@ public class ChangeNotificationTextService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		createNotif("test");
+		clipBoard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+		clipBoard.addPrimaryClipChangedListener(new ClipboardListener());
 	}
 	
 	@Override
@@ -82,7 +87,7 @@ public class ChangeNotificationTextService extends Service {
 		notificationManager.notify(0, noti); 
 	}
 
-	private void createAction(RemoteViews rv, int intentCommandType) {
+	/*private void createAction(RemoteViews rv, int intentCommandType) {
 		Intent intent = new Intent(this, ChangeNotificationTextService.class);
 		intent.putExtra(INTENT_COMMAND_TYPE, intentCommandType);
 		PendingIntent pIntent = PendingIntent.getService(getBaseContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -99,6 +104,15 @@ public class ChangeNotificationTextService extends Service {
 		default:
 			break;
 		}
+	}*/
+	
+	private class ClipboardListener implements ClipboardManager.OnPrimaryClipChangedListener {
+		
+		@Override
+		public void onPrimaryClipChanged() {
+			ClipData clip = clipBoard.getPrimaryClip();
+			Log.e("CLIP_DATA", clip.toString());
+		}		
 	}
 
 }

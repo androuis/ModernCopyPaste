@@ -1,4 +1,4 @@
-package com.example.moderncopypaste;
+package com.andreibacalu.android.moderncopypaste;
 
 import android.app.Activity;
 import android.os.Bundle;
