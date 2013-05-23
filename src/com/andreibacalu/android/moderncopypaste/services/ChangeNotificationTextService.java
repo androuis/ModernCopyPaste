@@ -1,5 +1,8 @@
 package com.andreibacalu.android.moderncopypaste.services;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,6 +13,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import com.andreibacalu.android.moderncopypaste.R;
@@ -20,7 +24,12 @@ public class ChangeNotificationTextService extends Service {
 	private static final int INTENT_COMMAND_TYPE_PREVIOUS = -1;	
 	private static final int INTENT_COMMAND_TYPE_NEXT = 1;	
 	private static final int INTENT_COMMAND_TYPE_USE = 0;
+	
+	private static final String DEFAULT_STRING = "You have no copied data yet";
+	
 	private ClipboardManager clipBoard;
+	private List<String> clipboardStrings = new ArrayList<String>();
+	private String currentSelectedString = "";
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -30,7 +39,8 @@ public class ChangeNotificationTextService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		createNotif("test");
+		currentSelectedString = DEFAULT_STRING;
+		createNotif(currentSelectedString);
 		clipBoard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
 		clipBoard.addPrimaryClipChangedListener(new ClipboardListener());
 	}
@@ -45,15 +55,40 @@ public class ChangeNotificationTextService extends Service {
 		int command = intent.getIntExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_USE);
 		switch (command) {
 		case INTENT_COMMAND_TYPE_PREVIOUS:
-			createNotif("previous");
+			createNotif(currentSelectedString = getStringInDirection(-1));
 			break;
 		case INTENT_COMMAND_TYPE_NEXT:
-			createNotif("next");
+			createNotif(currentSelectedString = getStringInDirection(1));
 			break;
 			
 		default:
 			break;
 		}
+	}
+
+	private String getStringInDirection(int direction) {
+		String computedString = DEFAULT_STRING;
+		if (!currentSelectedString.equals(DEFAULT_STRING) && clipboardStrings.contains(currentSelectedString)) {
+			int indexOfCurrentSelectedString = clipboardStrings.indexOf(currentSelectedString);
+			Log.e("MYAPP", String.valueOf(direction));
+			Log.e("MYAPP", String.valueOf(indexOfCurrentSelectedString));
+			Log.e("MYAPP", String.valueOf(clipboardStrings.size()));
+			if (direction > 0) {
+				if (indexOfCurrentSelectedString == clipboardStrings.size() - 1) {
+					computedString = clipboardStrings.get(0);
+				} else {
+					computedString = clipboardStrings.get(indexOfCurrentSelectedString + 1);
+				}
+			} else if (direction < 0) {
+				if (indexOfCurrentSelectedString == 0) {
+					computedString = clipboardStrings.get(clipboardStrings.size() - 1);
+				} else {
+					computedString = clipboardStrings.get(indexOfCurrentSelectedString - 1);
+				}
+			}
+		}
+		Log.e("MYAPP", computedString);
+		return computedString;
 	}
 
 	private void createNotif(String textString) {		
@@ -70,9 +105,13 @@ public class ChangeNotificationTextService extends Service {
 		pIntent = PendingIntent.getService(getBaseContext(), INTENT_COMMAND_TYPE_NEXT, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		rv.setOnClickPendingIntent(R.id.text_next, pIntent);
 		
-		/*createAction(rv, INTENT_COMMAND_TYPE_PREVIOUS);
-		createAction(rv, INTENT_COMMAND_TYPE_NEXT);
-		createAction(rv, INTENT_COMMAND_TYPE_USE);*/
+		if (clipboardStrings.size() < 2) {
+			rv.setViewVisibility(R.id.text_next, View.INVISIBLE);
+			rv.setViewVisibility(R.id.text_previous, View.INVISIBLE);
+		} else {
+			rv.setViewVisibility(R.id.text_next, View.VISIBLE);
+			rv.setViewVisibility(R.id.text_previous, View.VISIBLE);
+		}
 		
 		// Build notification
 		// Actions are just fake
@@ -86,32 +125,21 @@ public class ChangeNotificationTextService extends Service {
 
 		notificationManager.notify(0, noti); 
 	}
-
-	/*private void createAction(RemoteViews rv, int intentCommandType) {
-		Intent intent = new Intent(this, ChangeNotificationTextService.class);
-		intent.putExtra(INTENT_COMMAND_TYPE, intentCommandType);
-		PendingIntent pIntent = PendingIntent.getService(getBaseContext(), 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		switch (intentCommandType) {
-		case INTENT_COMMAND_TYPE_PREVIOUS:
-			rv.setOnClickPendingIntent(R.id.text_previous, pIntent);
-			break;
-		case INTENT_COMMAND_TYPE_NEXT:
-			rv.setOnClickPendingIntent(R.id.text_next, pIntent);
-			break;
-		case INTENT_COMMAND_TYPE_USE:
-			//rv.setOnClickPendingIntent(R.id.text_next, pIntent);
-			break;
-		default:
-			break;
-		}
-	}*/
 	
 	private class ClipboardListener implements ClipboardManager.OnPrimaryClipChangedListener {
 		
 		@Override
 		public void onPrimaryClipChanged() {
 			ClipData clip = clipBoard.getPrimaryClip();
-			Log.e("CLIP_DATA", clip.toString());
+			String clipData = "";
+			if (clip != null) {
+				clipData = (String) clip.getItemAt(0).getText();
+				if (clipData != null) {
+					clipboardStrings.remove(DEFAULT_STRING);
+					clipboardStrings.add(currentSelectedString = clipData);
+					createNotif(clipData);					
+				}
+			}
 		}		
 	}
 
