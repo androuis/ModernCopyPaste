@@ -134,7 +134,7 @@ public class ChangeNotificationTextService extends Service {
 			String clipData = "";
 			if (clip != null) {
 				clipData = (String) clip.getItemAt(0).getText();
-				if (clipData != null) {
+				if (clipData != null && (clipboardStrings.size() == 0 || !clipData.equals(clipboardStrings.get(clipboardStrings.size() - 1)))) {
 					clipboardStrings.remove(DEFAULT_STRING);
 					clipboardStrings.add(currentSelectedString = clipData);
 					createNotif(clipData);					
