@@ -1,4 +1,4 @@
-package com.andreibacalu.android.moderncopypaste;
+package com.andreibacalu.android.copied.activities;
 
 import android.app.Activity;
 import android.os.Bundle;

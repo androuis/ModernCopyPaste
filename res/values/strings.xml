@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Modern Copy Paste</string>
+    <string name="app_name">Copied</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
+    
+    <string name="clipdata_user_visible_label">Text copied using Modern Copy Paste</string>
+    
+    <string name="text_copied">Copied text: %s</string>
 
+    <string name="copy">Copy</string>
+    <string name="cut">Cut</string>
 </resources>

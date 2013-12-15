@@ -1,4 +1,4 @@
-package com.andreibacalu.android.moderncopypaste.receivers;
+package com.andreibacalu.android.copied.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
