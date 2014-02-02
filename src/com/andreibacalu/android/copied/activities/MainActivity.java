@@ -1,79 +1,177 @@
 package com.andreibacalu.android.copied.activities;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.view.Menu;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.RemoteViews;
-import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.andreibacalu.android.copied.R;
-import com.andreibacalu.android.copied.R.drawable;
-import com.andreibacalu.android.copied.R.id;
-import com.andreibacalu.android.copied.R.layout;
-import com.andreibacalu.android.copied.R.menu;
+import com.andreibacalu.android.copied.fragments.CopiedTextsFragment;
+import com.andreibacalu.android.copied.fragments.SettingsFragment;
+import com.andreibacalu.android.copied.fragments.TutorialFragment;
 import com.andreibacalu.android.copied.services.ChangeNotificationTextService;
+import com.andreibacalu.android.copied.utils.SharedPreferencesUtil;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
+
+	private DrawerLayout drawerLayout;
+	private ListView slidingMenuListView;
+	private ActionBarDrawerToggle drawerToggle;
+
+	private String[] menuOptions;
+
+	private Intent serviceIntent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getBaseContext().startService(
-				new Intent(getBaseContext(),
-						ChangeNotificationTextService.class));
-		finish();
-		/*
-		 * setContentView(R.layout.activity_main); textView = (TextView)
-		 * findViewById(R.id.hello_world); textView.setOnClickListener(new
-		 * OnClickListener() {
-		 * 
-		 * @Override public void onClick(View v) { //addNotification();
-		 * 
-		 * ClipboardManager clipboardManager = (ClipboardManager)
-		 * getSystemService(CLIPBOARD_SERVICE);
-		 * clipboardManager.setPrimaryClip(ClipData
-		 * .newPlainText("label vizibil", "copiat")); } });
-		 */
-	}
+		serviceIntent = new Intent(getBaseContext(),
+				ChangeNotificationTextService.class);
+		getBaseContext().startService(serviceIntent);
+		setContentView(R.layout.activity_main);
+		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		menuOptions = getResources().getStringArray(
+				R.array.sliding_menu_options);
+		slidingMenuListView = (ListView) findViewById(R.id.menu_content);
+		slidingMenuListView.setAdapter(new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, menuOptions));
+		slidingMenuListView
+				.setOnItemClickListener(new DrawerClickItemListener());
 
-	public void nextClicked(View view) {
-		Toast.makeText(getBaseContext(), "dsadad", Toast.LENGTH_LONG).show();
+		// enable ActionBar app icon to behave as action to toggle nav drawer
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
+
+		// ActionBarDrawerToggle ties together the the proper interactions
+		// between the sliding drawer and the action bar app icon
+		drawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
+		drawerLayout, /* DrawerLayout object */
+		R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
+		R.string.drawer_open, /* "open drawer" description for accessibility */
+		R.string.drawer_close /* "close drawer" description for accessibility */
+		) {
+			public void onDrawerClosed(View view) {
+				invalidateOptionsMenu(); // creates call to
+											// onPrepareOptionsMenu()
+			}
+
+			public void onDrawerOpened(View drawerView) {
+				getActionBar().setTitle(getString(R.string.app_name));
+				invalidateOptionsMenu(); // creates call to
+											// onPrepareOptionsMenu()
+			}
+		};
+		drawerLayout.setDrawerListener(drawerToggle);
+
+		if (savedInstanceState == null) {
+			selectItem(0);
+		}
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_main, menu);
-		return true;
+	protected void onResume() {
+		super.onResume();
+		Intent intent = getIntent();
+		if (intent != null) {
+			int command = intent.getIntExtra(ChangeNotificationTextService.INTENT_COMMAND_TYPE,
+					ChangeNotificationTextService.INTENT_COMMAND_TYPE_UNKNOWN);
+			if (command == ChangeNotificationTextService.INTENT_COMMAND_TYPE_OPEN_ACTIVITY) {
+				selectItem(0);
+			}
+		}
+	}
+	
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		// Sync the toggle state after onRestoreInstanceState has occurred.
+		drawerToggle.syncState();
 	}
 
-	protected void addNotification() {
-		// Prepare intent which is triggered if the
-		// notification is selected
-
-		Intent intent = new Intent(this, NotificationHandler.class);
-		PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-		RemoteViews rv = new RemoteViews(getPackageName(),
-				R.layout.notification_layout);
-		rv.setTextViewText(R.id.text_body, "test");
-
-		// Build notification
-		// Actions are just fake
-		Notification noti = new NotificationCompat.Builder(this).setContent(rv)
-				.setSmallIcon(R.drawable.ic_launcher).build();
-
-		rv.setOnClickPendingIntent(R.id.text_previous, pIntent);
-
-		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-		notificationManager.notify(0, noti);
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		// Pass any configuration change to the drawer toggls
+		drawerToggle.onConfigurationChanged(newConfig);
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// The action bar home/up action should open or close the drawer.
+		// ActionBarDrawerToggle will take care of this.
+		if (drawerToggle.onOptionsItemSelected(item)) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+    protected void onDestroy() {
+    	if (SharedPreferencesUtil.getInstance(getApplicationContext()).getSetting(SharedPreferencesUtil.SETTING_SERVICE_CLOSE)) {
+    		getBaseContext().stopService(serviceIntent);
+    	}
+    	super.onDestroy();
+    }
+
+	private class DrawerClickItemListener implements
+			ListView.OnItemClickListener {
+
+		@Override
+		public void onItemClick(AdapterView parent, View view, int position,
+				long id) {
+			selectItem(position);
+		}
+	}
+
+	/** Swaps fragments in the main content view */
+	private void selectItem(int position) {
+		// Create a new fragment and specify the planet to show based on
+		// position
+		Fragment fragment = getFragmentByPosition(position);
+
+		// Insert the fragment by replacing any existing fragment
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		fragmentManager.beginTransaction().replace(R.id.main_content, fragment)
+				.commit();
+
+		// Highlight the selected item, update the title, and close the drawer
+		slidingMenuListView.setItemChecked(position, true);
+		setTitle(menuOptions[position]);
+		drawerLayout.closeDrawer(slidingMenuListView);
+	}
+
+	private Fragment getFragmentByPosition(int position) {
+		Fragment fragment = null;
+		Bundle args = new Bundle();
+		switch (position) {
+		case 0:
+			fragment = new CopiedTextsFragment();
+			break;
+		case 1:
+			fragment = new SettingsFragment();
+			break;
+		case 2:
+			//TODO: TBD!
+			fragment = new TutorialFragment();
+			break;
+		default:
+			break;
+		}
+		fragment.setArguments(args);
+		return fragment;
+	}
+
+	@Override
+	public void setTitle(CharSequence title) {
+		getActionBar().setTitle(title);
+	}
 }
