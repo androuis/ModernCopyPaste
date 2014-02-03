@@ -5,10 +5,11 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="clipdata_user_visible_label">Text copied using Copied</string>
-    <string name="clipdata_not_listening_for_changes">Please tap on this text to start...</string>
+    <string name="clipdata_not_listening_for_changes">Please tap on this text to start&#8230;</string>
     <string name="text_copied">Copied text: %s</string>
     <string name="copy">Copy</string>
     <string name="cut">Cut</string>
+    <string name="added_to_clipboard">Text added to clipboard.</string>
 
     <string-array name="sliding_menu_options">
         <item>Texts to copy</item>
@@ -28,6 +29,10 @@
     <string name="settings_service_start_at_boot">Background service will automatically start when system starts</string>
 
     <!-- copied texts -->
-    <string name="empty_list">Go and copy some texts and this list will be populated. After that you can swipe to remove items or click and use them as if they were in the notification.</string>
+    <string name="empty_list">Copy some texts OR use the button bellow and this list will be populated.\nAfter that you can swipe to remove items or click and use them as if they were in the notification.</string>
     <string name="text_copied">Text copied.</string>
-</resources>
+    <string name="add_new_text">Add new text&#8230;</string>
+    <string name="add_new_text_title">Text to be added</string>
+    <string name="text_already_exists">The text you tried to add, already exists.</string>
+    <string name="text_empty">The text you tried to add, is empty.</string>
+</resources>

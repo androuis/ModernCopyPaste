@@ -1,15 +1,20 @@
 package com.andreibacalu.android.copied.fragments;
 
-import java.util.ArrayList;
-
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -17,14 +22,16 @@ import com.andreibacalu.android.copied.R;
 import com.andreibacalu.android.copied.adapters.CopiedTextsAdapter;
 import com.andreibacalu.android.copied.application.CopiedApplication;
 import com.andreibacalu.android.copied.services.ChangeNotificationTextService;
-import com.andreibacalu.android.copied.utils.GeneralUtil;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 
 public class CopiedTextsFragment extends Fragment implements
 		OnItemClickListener {
 
+	private static final String TAG_LOG = CopiedTextsFragment.class
+			.getSimpleName();
+	private static final String TAG_DIALOG_ADD_TEXT = "dialog_add_text";
+
 	private CopiedTextsAdapter adapter;
-	private ArrayList<String> initialList;
 	private ListView listView;
 
 	@Override
@@ -68,6 +75,15 @@ public class CopiedTextsFragment extends Fragment implements
 		listView.setOnScrollListener(touchListener.makeScrollListener());
 		listView.setOnItemClickListener(this);
 		listView.setEmptyView(view.findViewById(R.id.empty_view));
+
+		view.findViewById(R.id.list_view_add).setOnClickListener(
+				new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						DialogFragment dialogFragment = new AddTextDialogFragment();
+						dialogFragment.show(getActivity().getSupportFragmentManager(), TAG_DIALOG_ADD_TEXT);
+					}
+				});
 	}
 
 	@Override
@@ -75,7 +91,7 @@ public class CopiedTextsFragment extends Fragment implements
 		super.onResume();
 		adapter = new CopiedTextsAdapter(getActivity(),
 				android.R.layout.simple_list_item_1, android.R.id.text1,
-				initialList = CopiedApplication.getList());
+				CopiedApplication.getList());
 		listView.setAdapter(adapter);
 	}
 
@@ -100,5 +116,41 @@ public class CopiedTextsFragment extends Fragment implements
 		getActivity().getBaseContext().startService(intent);
 		Toast.makeText(getActivity(), getString(R.string.text_copied),
 				Toast.LENGTH_SHORT).show();
+	}
+
+	private class AddTextDialogFragment extends DialogFragment implements
+			android.content.DialogInterface.OnClickListener {
+
+		private EditText editText;
+
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			editText = new EditText(getActivity());
+			return new AlertDialog.Builder(getActivity())
+					.setTitle(R.string.add_new_text_title)
+					.setPositiveButton(getString(android.R.string.ok), this)
+					.setNegativeButton(getString(android.R.string.cancel), null)
+					.setView(editText).create();
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int position) {
+			String textToBeAdded = editText.getText().toString();
+			if (textToBeAdded != null && !textToBeAdded.trim().isEmpty()
+					&& !CopiedApplication.clipboarStringsContain(textToBeAdded)) {
+				Log.i(TAG_LOG, "adding text: " + textToBeAdded);
+				adapter.add(textToBeAdded);
+				adapter.notifyDataSetChanged();
+				CopiedApplication.setCurrentSelectedString(textToBeAdded);
+				replaceListAndNotify();
+			} else if (textToBeAdded != null && !textToBeAdded.trim().isEmpty()) {
+				Log.i(TAG_LOG, "already exists: " + textToBeAdded);
+				Toast.makeText(getActivity(), getString(R.string.text_already_exists), Toast.LENGTH_LONG).show();
+			} else {
+				Log.i(TAG_LOG, "empty");
+				Toast.makeText(getActivity(), getString(R.string.text_empty), Toast.LENGTH_LONG).show();
+			}
+			dialog.dismiss();
+		}
 	}
 }

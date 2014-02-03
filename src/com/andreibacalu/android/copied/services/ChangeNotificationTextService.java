@@ -102,6 +102,7 @@ public class ChangeNotificationTextService extends Service {
 			notificationManager.cancelAll();
 			createNotif(CopiedApplication.getCurrentSelectedString());
 			clipBoard.addPrimaryClipChangedListener(clipBoardListener);
+			displayAddedToClipboardToast();
 			break;
 		case INTENT_COMMAND_TYPE_CUT:
 			clipBoard.removePrimaryClipChangedListener(clipBoardListener);
@@ -129,6 +130,7 @@ public class ChangeNotificationTextService extends Service {
 				createNotif(CopiedApplication.getCurrentSelectedString());
 			}
 			clipBoard.addPrimaryClipChangedListener(clipBoardListener);
+			displayAddedToClipboardToast();
 			break;
 		case INTENT_COMMAND_TYPE_API_18_ERROR_CASE:
 			if (clipBoardListener == null) {
@@ -150,6 +152,10 @@ public class ChangeNotificationTextService extends Service {
 			startActivity(i);
 			break;
 		}
+	}
+
+	private void displayAddedToClipboardToast() {
+		Toast.makeText(getApplicationContext(), getString(R.string.added_to_clipboard), Toast.LENGTH_SHORT).show();
 	}
 
 	private String getStringInDirection(int direction) {
@@ -281,8 +287,8 @@ public class ChangeNotificationTextService extends Service {
 		public void onPrimaryClipChanged() {
 			ClipData clipData = clipBoard.getPrimaryClip();
 			String clipText = "";
-			if (clipData != null) {
-				clipText = (String) clipData.getItemAt(0).getText();
+			if (clipData != null && clipData.getItemCount() > 0 && clipData.getItemAt(0).getText() != null) {
+				clipText = clipData.getItemAt(0).getText().toString();
 				if (clipText != null) {
 					if (!CopiedApplication.clipboarStringsContain(clipText)) {
 						CopiedApplication.addStringToClipboard(clipText);
