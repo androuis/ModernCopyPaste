@@ -10,6 +10,8 @@
     <string name="copy">Copy</string>
     <string name="cut">Cut</string>
     <string name="added_to_clipboard">Text added to clipboard.</string>
+    <string name="previous_text">Previous text</string>
+    <string name="next_text">Next text</string>
 
     <string-array name="sliding_menu_options">
         <item>Texts to copy</item>

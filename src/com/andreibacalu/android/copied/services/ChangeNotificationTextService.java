@@ -227,13 +227,91 @@ public class ChangeNotificationTextService extends Service {
 	}
 
 	private void createNotif(String textString) {
-		//TODO: if os >=4.1...else...
-		//createBigStyleNotification(textString);
-		createNormalNotification(textString);
+		// TODO: if os >=4.1...else...
+		createBigStyleNotification(textString);
+		// createNormalNotification(textString);
 	}
 
 	private void createBigStyleNotification(String textString) {
-		// TODO Auto-generated method stub
+		String textForNotification = textString.substring(0, textString
+				.length() > MAX_TOAST_TEXT_LENGHT ? MAX_TOAST_TEXT_LENGHT
+				: textString.length());
+		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(
+				getApplicationContext())
+				.setContentTitle(getString(R.string.app_name))
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentText(
+						textForNotification.length() == textString.length() ? textForNotification
+								: textForNotification + "...")
+				.setStyle(
+						new NotificationCompat.BigTextStyle()
+								.bigText(textString));
+		
+		Intent intent = new Intent(this, ChangeNotificationTextService.class);
+		intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_OPEN_ACTIVITY);
+		PendingIntent pIntentOpenActivity = PendingIntent.getService(getBaseContext(),
+				INTENT_COMMAND_TYPE_OPEN_ACTIVITY, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+
+		intent = new Intent(this, ChangeNotificationTextService.class);
+		intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_PREVIOUS);
+		PendingIntent pIntentPrevious = PendingIntent.getService(getBaseContext(),
+				INTENT_COMMAND_TYPE_PREVIOUS, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+
+		intent = new Intent(this, ChangeNotificationTextService.class);
+		intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_NEXT);
+		PendingIntent pIntentNext = PendingIntent.getService(getBaseContext(),
+				INTENT_COMMAND_TYPE_NEXT, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+
+		if (clipBoardListener == null) {
+			intent = new Intent(this, ChangeNotificationTextService.class);
+			intent.putExtra(INTENT_COMMAND_TYPE,
+					INTENT_COMMAND_TYPE_API_18_ERROR_CASE);
+			PendingIntent pIntent = PendingIntent.getService(getBaseContext(),
+					INTENT_COMMAND_TYPE_API_18_ERROR_CASE, intent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+		}
+
+		PendingIntent pIntentCopy = null;
+		PendingIntent pIntentCut = null;
+		if (!textString.contains(CopiedApplication.DEFAULT_STRING)) {
+			intent = new Intent(this, ChangeNotificationTextService.class);
+			intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_COPY);
+			pIntentCopy = PendingIntent.getService(getBaseContext(),
+					INTENT_COMMAND_TYPE_COPY, intent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+
+			intent = new Intent(this, ChangeNotificationTextService.class);
+			intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_CUT);
+			pIntentCut = PendingIntent.getService(getBaseContext(),
+					INTENT_COMMAND_TYPE_CUT, intent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+		}
+
+		if (CopiedApplication.getNumberOfTextsInClipboard() >= 2) {
+			notificationBuilder
+				.addAction(R.drawable.icon_previous, getString(R.string.previous_text), pIntentPrevious)
+				.addAction(0, getString(R.string.copy), pIntentCopy)
+				.addAction(R.drawable.icon_next, getString(R.string.next_text), pIntentNext);
+		} else if (CopiedApplication.getNumberOfTextsInClipboard() == 1
+				&& !CopiedApplication.getClipboarString(0).contains(
+						CopiedApplication.DEFAULT_STRING)) {
+			notificationBuilder
+				.addAction(0, getString(R.string.copy), pIntentCopy)
+				.addAction(0, getString(R.string.cut), pIntentCut);
+		}
+		
+		Notification notification = notificationBuilder.setContentIntent(pIntentOpenActivity)
+				.build();
+		if (Integer.valueOf(android.os.Build.VERSION.SDK) >= 16) {
+			notification.priority = SharedPreferencesUtil.getInstance(
+					getApplicationContext()).getSetting(
+					SharedPreferencesUtil.SETTING_DISPLAY_NOTIFICATION) ? Notification.PRIORITY_DEFAULT
+					: Notification.PRIORITY_MIN;
+		}
+		notificationManager.notify(NOTIFICATION_ID, notification);
 	}
 
 	private void createNormalNotification(String textString) {
@@ -325,8 +403,6 @@ public class ChangeNotificationTextService extends Service {
 		}
 		notificationManager.notify(NOTIFICATION_ID, notification);
 	}
-
-
 
 	private class ClipboardListener implements
 			ClipboardManager.OnPrimaryClipChangedListener {

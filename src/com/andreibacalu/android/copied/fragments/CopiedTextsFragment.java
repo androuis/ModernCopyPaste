@@ -39,6 +39,7 @@ public class CopiedTextsFragment extends Fragment implements
 
 	private CopiedTextsAdapter adapter;
 	private ListView listView;
+	private boolean isFirstLaunch;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,20 +99,27 @@ public class CopiedTextsFragment extends Fragment implements
 								TAG_DIALOG_ADD_TEXT);
 					}
 				});
+		
+		refreshList(true);
+		isFirstLaunch = true;
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		refreshList();
+		if (!isFirstLaunch) {
+			refreshList(false);
+		}
+		isFirstLaunch = false;
 	}
 
-	private void refreshList() {
-		List<String> textsList = CopiedApplication
-				.getNumberOfTextsInClipboard() > 0 ? CopiedApplication
-				.getList() : new ArrayList<String>(SharedPreferencesUtil
-				.getInstance(getActivity().getApplicationContext())
-				.getTextsList());
+	private void refreshList(boolean withCheck) {
+		List<String> textsList = CopiedApplication.getList();
+		if (withCheck) {
+			textsList = CopiedApplication.getNumberOfTextsInClipboard() > 0 ? 
+					textsList : 
+					new ArrayList<String>(SharedPreferencesUtil.getInstance(getActivity().getApplicationContext()).getTextsList());
+		}
 		adapter = new CopiedTextsAdapter(getActivity(),
 				android.R.layout.simple_list_item_1, android.R.id.text1,
 				textsList);
@@ -147,12 +155,12 @@ public class CopiedTextsFragment extends Fragment implements
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		if (position <= CopiedApplication.getNumberOfTextsInClipboard()) {
+		if (position < CopiedApplication.getNumberOfTextsInClipboard()) {
 			CopiedApplication.setCurrentSelectedString(CopiedApplication
 					.getList().get(position));
 			sendCommandCopy();
 		} else {
-			refreshList();
+			refreshList(false);
 		}
 	}
 
