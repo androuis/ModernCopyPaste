@@ -54,11 +54,12 @@ public class SharedPreferencesUtil {
 		sharedPreferences.edit().putBoolean(key, booleanValue).commit();
 	}
 	
-	public synchronized void setList(Set<String> set) {
-		sharedPreferences.edit().putStringSet(NOTIFICATION_TEXTS_LIST, set);
+	public synchronized void setTextsList(Set<String> set) {
+		sharedPreferences.edit().putStringSet(NOTIFICATION_TEXTS_LIST, set).commit();
 	}
 	
-	public synchronized Set<String> getList() {
-		return sharedPreferences.getStringSet(NOTIFICATION_TEXTS_LIST, new HashSet<String>());
+	public synchronized Set<String> getTextsList() {
+		Set<String> hashSet = sharedPreferences.getStringSet(NOTIFICATION_TEXTS_LIST, new HashSet<String>());
+		return hashSet;
 	}
 }

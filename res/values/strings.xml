@@ -35,4 +35,5 @@
     <string name="add_new_text_title">Text to be added</string>
     <string name="text_already_exists">The text you tried to add, already exists.</string>
     <string name="text_empty">The text you tried to add, is empty.</string>
+    <string name="edit_text_title">Edit selected text</string>
 </resources>

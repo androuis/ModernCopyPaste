@@ -2,14 +2,14 @@ package com.andreibacalu.android.copied.application;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
-import com.andreibacalu.android.copied.R.string;
 
 import android.app.Application;
+import android.util.Log;
 
 public class CopiedApplication extends Application {
 
+	private final static String TAG_LOG = CopiedApplication.class.getSimpleName();
+	
 	public final static String DEFAULT_STRING = "You have no copied data yet.";
 	
 	private static List<String> clipboardStrings = new ArrayList<String>();
@@ -54,6 +54,7 @@ public class CopiedApplication extends Application {
 	}
 	
 	public static int getNumberOfTextsInClipboard() {
+		Log.e(TAG_LOG, "getNumberOfTextsInClipboard: " + clipboardStrings.size());
 		return clipboardStrings.size();
 	}
 	
@@ -69,5 +70,11 @@ public class CopiedApplication extends Application {
 		clipboardStrings.clear();
 		clipboardStrings.addAll(list);
 		setCurrentSelectedString(clipboardStrings.size() > 0 ? clipboardStrings.get(0) : DEFAULT_STRING);
+	}
+	
+	public static void replaceString(String oldString, String newString) {
+		if (clipboardStrings.indexOf(oldString) > -1) {
+			clipboardStrings.set(clipboardStrings.indexOf(oldString), newString);
+		}
 	}
 }

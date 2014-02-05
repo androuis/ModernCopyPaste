@@ -1,5 +1,7 @@
 package com.andreibacalu.android.copied.activities;
 
+import java.util.HashSet;
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.andreibacalu.android.copied.R;
+import com.andreibacalu.android.copied.application.CopiedApplication;
 import com.andreibacalu.android.copied.fragments.CopiedTextsFragment;
 import com.andreibacalu.android.copied.fragments.SettingsFragment;
 import com.andreibacalu.android.copied.fragments.TutorialFragment;
@@ -23,6 +27,8 @@ import com.andreibacalu.android.copied.utils.SharedPreferencesUtil;
 
 public class MainActivity extends FragmentActivity {
 
+	private final static String TAG_LOG = MainActivity.class.getSimpleName();
+	
 	private DrawerLayout drawerLayout;
 	private ListView slidingMenuListView;
 	private ActionBarDrawerToggle drawerToggle;
@@ -34,9 +40,6 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		serviceIntent = new Intent(getBaseContext(),
-				ChangeNotificationTextService.class);
-		getBaseContext().startService(serviceIntent);
 		setContentView(R.layout.activity_main);
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		menuOptions = getResources().getStringArray(
@@ -80,6 +83,9 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		serviceIntent = new Intent(getBaseContext(),
+				ChangeNotificationTextService.class);
+		getBaseContext().startService(serviceIntent);
 		Intent intent = getIntent();
 		if (intent != null) {
 			int command = intent.getIntExtra(ChangeNotificationTextService.INTENT_COMMAND_TYPE,
@@ -116,9 +122,11 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
     protected void onDestroy() {
+		Log.e(TAG_LOG, "onDestroy");
     	if (SharedPreferencesUtil.getInstance(getApplicationContext()).getSetting(SharedPreferencesUtil.SETTING_SERVICE_CLOSE)) {
     		getBaseContext().stopService(serviceIntent);
     	}
+    	SharedPreferencesUtil.getInstance(getApplicationContext()).setTextsList(new HashSet<String>(CopiedApplication.getList()));
     	super.onDestroy();
     }
 
