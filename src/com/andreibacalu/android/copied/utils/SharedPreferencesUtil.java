@@ -3,7 +3,6 @@ package com.andreibacalu.android.copied.utils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,6 +17,8 @@ public class SharedPreferencesUtil {
 	public final static String SETTING_DISPLAY_NOTIFICATION = "displayNotification";
 	public final static String SETTING_SERVICE_CLOSE = "serviceClose";
 	public final static String SETTING_SERVICE_BOOT = "serviceBoot";
+	public final static String SETTING_NOTIFICATION_NO_CLEAR = "notificationNoClear";
+	public final static String SETTING_NOTIFICATION_BIG_VIEW = "notificationBigView";
 	
 	public final static String NOTIFICATION_TEXTS_LIST = "notification_texts_list";
 
@@ -28,6 +29,8 @@ public class SharedPreferencesUtil {
 		m.put(SETTING_DISPLAY_NOTIFICATION, true);
 		m.put(SETTING_SERVICE_CLOSE, false);
 		m.put(SETTING_SERVICE_BOOT, false);
+		m.put(SETTING_NOTIFICATION_NO_CLEAR, false);
+		m.put(SETTING_NOTIFICATION_BIG_VIEW, false);
 		defaultValues = Collections.unmodifiableMap(m);
 	}
 

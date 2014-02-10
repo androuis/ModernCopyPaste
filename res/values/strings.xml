@@ -29,10 +29,12 @@
     <string name="settings_lifecycle">Customize app lifecycle</string>
     <string name="settings_service_close_with_app">Closing the app, will close the background service &amp; dismiss notifications</string>
     <string name="settings_service_start_at_boot">Background service will automatically start when system starts</string>
+    <string name="settings_notification">Customize notifications</string>
+    <string name="settings_notification_no_clear">Do not clear the notification from notification view</string>
+    <string name="settings_notification_big_view">Use Big view (like gmail) for notifications</string>
 
     <!-- copied texts -->
     <string name="empty_list">Copy some texts OR use the button bellow and this list will be populated.\nAfter that you can swipe to remove items or click and use them as if they were in the notification.</string>
-    <string name="text_copied">Text copied.</string>
     <string name="add_new_text">Add new text&#8230;</string>
     <string name="add_new_text_title">Text to be added</string>
     <string name="text_already_exists">The text you tried to add, already exists.</string>

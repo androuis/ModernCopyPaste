@@ -62,7 +62,7 @@ public class ChangeNotificationTextService extends Service {
 			clipBoard.addPrimaryClipChangedListener(clipBoardListener);
 		}
 		notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		createNotif(CopiedApplication.getCurrentSelectedString());
+		createNotif(CopiedApplication.getCurrentSelectedString(), false);
 	}
 
 	@Override
@@ -95,11 +95,11 @@ public class ChangeNotificationTextService extends Service {
 		case INTENT_COMMAND_TYPE_PREVIOUS:
 			CopiedApplication
 					.setCurrentSelectedString(getStringInDirection(-1));
-			createNotif(CopiedApplication.getCurrentSelectedString());
+			createNotif(CopiedApplication.getCurrentSelectedString(), false);
 			break;
 		case INTENT_COMMAND_TYPE_NEXT:
 			CopiedApplication.setCurrentSelectedString(getStringInDirection(1));
-			createNotif(CopiedApplication.getCurrentSelectedString());
+			createNotif(CopiedApplication.getCurrentSelectedString(), false);
 			break;
 		case INTENT_COMMAND_TYPE_COPY:
 			clipBoard.removePrimaryClipChangedListener(clipBoardListener);
@@ -111,7 +111,6 @@ public class ChangeNotificationTextService extends Service {
 				Log.e(TAG_LOG, e.getMessage());
 			}
 			notificationManager.cancelAll();
-			createNotif(CopiedApplication.getCurrentSelectedString());
 			clipBoard.addPrimaryClipChangedListener(clipBoardListener);
 			displayAddedToClipboardToast();
 			break;
@@ -127,7 +126,6 @@ public class ChangeNotificationTextService extends Service {
 			indexOfCurrentSelectedString = CopiedApplication
 					.removeStringFromClipboard(CopiedApplication
 							.getCurrentSelectedString());
-			notificationManager.cancelAll();
 			numberOfTextsInClipboard = CopiedApplication
 					.getNumberOfTextsInClipboard();
 			if (numberOfTextsInClipboard > 0) {
@@ -136,9 +134,9 @@ public class ChangeNotificationTextService extends Service {
 								.getClipboarString(indexOfCurrentSelectedString)
 								: CopiedApplication
 										.getClipboarString(indexOfCurrentSelectedString - 1));
-				createNotif(CopiedApplication.getCurrentSelectedString());
+				createNotif(CopiedApplication.getCurrentSelectedString(), true);
 			} else {
-				createNotif(CopiedApplication.getCurrentSelectedString());
+				createNotif(CopiedApplication.getCurrentSelectedString(), true);
 			}
 			clipBoard.addPrimaryClipChangedListener(clipBoardListener);
 			displayAddedToClipboardToast();
@@ -148,16 +146,13 @@ public class ChangeNotificationTextService extends Service {
 				clipBoardListener = new ClipboardListener();
 				clipBoard.addPrimaryClipChangedListener(clipBoardListener);
 			}
-			notificationManager.cancelAll();
-			createNotif(CopiedApplication.getCurrentSelectedString());
+			createNotif(CopiedApplication.getCurrentSelectedString(), false);
 			break;
 		case INTENT_COMMAND_TYPE_CHANGE_NOTIF:
-			notificationManager.cancelAll();
-			createNotif(CopiedApplication.getCurrentSelectedString());
+			createNotif(CopiedApplication.getCurrentSelectedString(), true);
 			break;
 		case INTENT_COMMAND_TYPE_OPEN_ACTIVITY:
-			notificationManager.cancelAll();
-			createNotif(CopiedApplication.getCurrentSelectedString());
+			createNotif(CopiedApplication.getCurrentSelectedString(), false);
 			Intent i = new Intent(this, MainActivity.class);
 			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(i);
@@ -166,7 +161,6 @@ public class ChangeNotificationTextService extends Service {
 			int positionToBeRemoved = intent.getIntExtra(
 					INTENT_REMOVE_POSITION, -1);
 			if (positionToBeRemoved != -1) {
-				notificationManager.cancelAll();
 				String stringToBeRemoved = CopiedApplication
 						.getClipboarString(positionToBeRemoved);
 				CopiedApplication.removeStringFromClipboard(stringToBeRemoved);
@@ -182,7 +176,7 @@ public class ChangeNotificationTextService extends Service {
 												.getClipboarString(positionToBeRemoved - 1));
 					}
 				}
-				createNotif(CopiedApplication.getCurrentSelectedString());
+				createNotif(CopiedApplication.getCurrentSelectedString(), true);
 			}
 			break;
 		}
@@ -226,10 +220,19 @@ public class ChangeNotificationTextService extends Service {
 		return computedString;
 	}
 
-	private void createNotif(String textString) {
-		// TODO: if os >=4.1...else...
-		createBigStyleNotification(textString);
-		// createNormalNotification(textString);
+	private void createNotif(String textString, boolean dismissCurrent) {
+		if (dismissCurrent) {
+			notificationManager.cancelAll();
+		}
+		if (Integer.valueOf(android.os.Build.VERSION.SDK) >= 16
+				&& SharedPreferencesUtil
+						.getInstance(getApplicationContext())
+						.getSetting(
+								SharedPreferencesUtil.SETTING_NOTIFICATION_BIG_VIEW)) {
+			createBigStyleNotification(textString);
+		} else {
+			createNormalNotification(textString);
+		}
 	}
 
 	private void createBigStyleNotification(String textString) {
@@ -275,7 +278,6 @@ public class ChangeNotificationTextService extends Service {
 		}
 
 		PendingIntent pIntentCopy = null;
-		PendingIntent pIntentCut = null;
 		if (!textString.contains(CopiedApplication.DEFAULT_STRING)) {
 			intent = new Intent(this, ChangeNotificationTextService.class);
 			intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_COPY);
@@ -285,9 +287,6 @@ public class ChangeNotificationTextService extends Service {
 
 			intent = new Intent(this, ChangeNotificationTextService.class);
 			intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_CUT);
-			pIntentCut = PendingIntent.getService(getBaseContext(),
-					INTENT_COMMAND_TYPE_CUT, intent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
 		}
 
 		if (CopiedApplication.getNumberOfTextsInClipboard() >= 2) {
@@ -299,8 +298,7 @@ public class ChangeNotificationTextService extends Service {
 				&& !CopiedApplication.getClipboarString(0).contains(
 						CopiedApplication.DEFAULT_STRING)) {
 			notificationBuilder
-				.addAction(0, getString(R.string.copy), pIntentCopy)
-				.addAction(0, getString(R.string.cut), pIntentCut);
+				.addAction(0, getString(R.string.copy), pIntentCopy);
 		}
 		
 		Notification notification = notificationBuilder.setContentIntent(pIntentOpenActivity)
@@ -310,6 +308,9 @@ public class ChangeNotificationTextService extends Service {
 					getApplicationContext()).getSetting(
 					SharedPreferencesUtil.SETTING_DISPLAY_NOTIFICATION) ? Notification.PRIORITY_DEFAULT
 					: Notification.PRIORITY_MIN;
+		}
+		if (SharedPreferencesUtil.getInstance(getApplicationContext()).getSetting(SharedPreferencesUtil.SETTING_NOTIFICATION_NO_CLEAR)) {
+			notification.flags |= Notification.FLAG_NO_CLEAR;
 		}
 		notificationManager.notify(NOTIFICATION_ID, notification);
 	}
@@ -401,6 +402,9 @@ public class ChangeNotificationTextService extends Service {
 					SharedPreferencesUtil.SETTING_DISPLAY_NOTIFICATION) ? Notification.PRIORITY_DEFAULT
 					: Notification.PRIORITY_MIN;
 		}
+		if (SharedPreferencesUtil.getInstance(getApplicationContext()).getSetting(SharedPreferencesUtil.SETTING_NOTIFICATION_NO_CLEAR)) {
+			notification.flags |= Notification.FLAG_NO_CLEAR;
+		}
 		notificationManager.notify(NOTIFICATION_ID, notification);
 	}
 
@@ -417,7 +421,7 @@ public class ChangeNotificationTextService extends Service {
 				if (clipText != null) {
 					if (!CopiedApplication.clipboarStringsContain(clipText)) {
 						CopiedApplication.addStringToClipboard(clipText);
-						createNotif(clipText);
+						createNotif(clipText, false);
 						String textToBeDisplayed = clipText
 								.substring(
 										0,

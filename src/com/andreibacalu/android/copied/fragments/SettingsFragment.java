@@ -29,21 +29,29 @@ public class SettingsFragment extends Fragment implements
 		setViewChecked(R.id.settings_display_toast);
 		if (Integer.valueOf(android.os.Build.VERSION.SDK) >= 16) {
 			setViewChecked(R.id.settings_display_notification);
+			setViewChecked(R.id.settings_notification_big_view);
 		} else {
 			view.findViewById(R.id.settings_display_notification)
 					.setVisibility(View.GONE);
 			view.findViewById(R.id.settings_display_notification_delimiter)
 					.setVisibility(View.GONE);
+			view.findViewById(R.id.settings_notification_big_view)
+					.setVisibility(View.GONE);
+			view.findViewById(R.id.settings_notification_big_view_delimiter)
+					.setVisibility(View.GONE);
 		}
 		setViewChecked(R.id.settings_service_close_app);
 		setViewChecked(R.id.settings_service_start_at_boot);
+		setViewChecked(R.id.settings_notification_no_clear);
 	}
 
 	private void updateSettingFromView(int settingViewId, boolean isChecked) {
 		SharedPreferencesUtil
 				.getInstance(getActivity().getApplicationContext()).setSetting(
 						getSettingKeyForViewId(settingViewId), isChecked);
-		if (settingViewId == R.id.settings_display_notification) {
+		if (settingViewId == R.id.settings_display_notification
+				|| settingViewId == R.id.settings_notification_no_clear
+				|| settingViewId == R.id.settings_notification_big_view) {
 			Intent intent = new Intent(getActivity().getBaseContext(),
 					ChangeNotificationTextService.class);
 			intent.putExtra(
@@ -72,6 +80,10 @@ public class SettingsFragment extends Fragment implements
 			return SharedPreferencesUtil.SETTING_SERVICE_CLOSE;
 		} else if (id == R.id.settings_service_start_at_boot) {
 			return SharedPreferencesUtil.SETTING_SERVICE_BOOT;
+		} else if (id == R.id.settings_notification_no_clear) {
+			return SharedPreferencesUtil.SETTING_NOTIFICATION_NO_CLEAR;
+		} else if (id == R.id.settings_notification_big_view) {
+			return SharedPreferencesUtil.SETTING_NOTIFICATION_BIG_VIEW;
 		}
 		return null;
 	}
