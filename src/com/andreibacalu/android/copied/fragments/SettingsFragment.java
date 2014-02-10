@@ -63,12 +63,15 @@ public class SettingsFragment extends Fragment implements
 
 	private void setViewChecked(int settingViewId) {
 		View view = getView();
-		((CheckBox) view.findViewById(settingViewId))
-				.setChecked(SharedPreferencesUtil.getInstance(
-						getActivity().getApplicationContext()).getSetting(
-						getSettingKeyForViewId(settingViewId)));
-		((CheckBox) view.findViewById(settingViewId))
-				.setOnCheckedChangeListener(this);
+		if (view != null) {
+			View checkBox = view.findViewById(settingViewId);
+			if (checkBox != null && checkBox instanceof CheckBox) {
+				((CheckBox) checkBox).setChecked(SharedPreferencesUtil
+						.getInstance(getActivity().getApplicationContext())
+						.getSetting(getSettingKeyForViewId(settingViewId)));
+				((CheckBox) checkBox).setOnCheckedChangeListener(this);
+			}
+		}
 	}
 
 	private String getSettingKeyForViewId(int id) {

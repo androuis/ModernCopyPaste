@@ -29,7 +29,7 @@ public class SharedPreferencesUtil {
 		m.put(SETTING_DISPLAY_NOTIFICATION, true);
 		m.put(SETTING_SERVICE_CLOSE, false);
 		m.put(SETTING_SERVICE_BOOT, false);
-		m.put(SETTING_NOTIFICATION_NO_CLEAR, false);
+		m.put(SETTING_NOTIFICATION_NO_CLEAR, true);
 		m.put(SETTING_NOTIFICATION_BIG_VIEW, false);
 		defaultValues = Collections.unmodifiableMap(m);
 	}
