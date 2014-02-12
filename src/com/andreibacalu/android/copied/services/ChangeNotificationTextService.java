@@ -1,7 +1,5 @@
 package com.andreibacalu.android.copied.services;
 
-import java.util.HashSet;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

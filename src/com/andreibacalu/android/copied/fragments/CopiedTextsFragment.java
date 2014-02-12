@@ -3,17 +3,12 @@ package com.andreibacalu.android.copied.fragments;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,19 +17,20 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.andreibacalu.android.copied.R;
 import com.andreibacalu.android.copied.adapters.CopiedTextsAdapter;
 import com.andreibacalu.android.copied.application.CopiedApplication;
+import com.andreibacalu.android.copied.dialogs.AddTextDialogFragment;
+import com.andreibacalu.android.copied.dialogs.AddTextDialogFragment.AddTextDialogFragmentActionResponse;
 import com.andreibacalu.android.copied.services.ChangeNotificationTextService;
 import com.andreibacalu.android.copied.utils.SharedPreferencesUtil;
 import com.example.android.swipedismiss.SwipeDismissListViewTouchListener;
 
 public class CopiedTextsFragment extends Fragment implements
-		OnItemClickListener, OnItemLongClickListener {
+		OnItemClickListener, OnItemLongClickListener,
+		AddTextDialogFragmentActionResponse {
 
 	private static final String TAG_LOG = CopiedTextsFragment.class
 			.getSimpleName();
@@ -43,6 +39,10 @@ public class CopiedTextsFragment extends Fragment implements
 	private CopiedTextsAdapter adapter;
 	private ListView listView;
 	private CutTextBroadcastReceiver cutTextBroadcastReceiver;
+	private AddTextDialogFragment dialogFragment;
+
+	public CopiedTextsFragment() {
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,16 +98,24 @@ public class CopiedTextsFragment extends Fragment implements
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						DialogFragment dialogFragment = new AddTextDialogFragment();
+						dialogFragment = new AddTextDialogFragment(AddTextDialogFragment.TYPE_CREATE, "", CopiedTextsFragment.this);
 						dialogFragment.show(getActivity()
 								.getSupportFragmentManager(),
 								TAG_DIALOG_ADD_TEXT);
 					}
 				});
-		
+
 		refreshList(false);
 		cutTextBroadcastReceiver = new CutTextBroadcastReceiver();
-		getActivity().registerReceiver(cutTextBroadcastReceiver, new IntentFilter(getString(R.string.action_cut_performed)));
+		getActivity().registerReceiver(cutTextBroadcastReceiver,
+				new IntentFilter(getString(R.string.action_cut_performed)));
+
+		if (savedInstanceState != null) {
+			dialogFragment = (AddTextDialogFragment) getActivity().getSupportFragmentManager().findFragmentByTag(TAG_DIALOG_ADD_TEXT);
+			if (dialogFragment != null) {
+				dialogFragment.setListener(this);
+			}
+		}
 	}
 
 	@Override
@@ -119,9 +127,10 @@ public class CopiedTextsFragment extends Fragment implements
 	private void refreshList(boolean withCheck) {
 		List<String> textsList = CopiedApplication.getList();
 		if (withCheck) {
-			textsList = CopiedApplication.getNumberOfTextsInClipboard() > 0 ? 
-					textsList : 
-					new ArrayList<String>(SharedPreferencesUtil.getInstance(getActivity().getApplicationContext()).getTextsList());
+			textsList = CopiedApplication.getNumberOfTextsInClipboard() > 0 ? textsList
+					: new ArrayList<String>(SharedPreferencesUtil.getInstance(
+							getActivity().getApplicationContext())
+							.getTextsList());
 		}
 		adapter = new CopiedTextsAdapter(getActivity(),
 				android.R.layout.simple_list_item_1, android.R.id.text1,
@@ -170,110 +179,38 @@ public class CopiedTextsFragment extends Fragment implements
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view,
 			int position, long id) {
-		DialogFragment dialogFragment = new AddTextDialogFragment(
-				AddTextDialogFragment.TYPE_EDIT, adapter.getItem(position));
+		dialogFragment = new AddTextDialogFragment(
+				AddTextDialogFragment.TYPE_EDIT, adapter.getItem(position),
+				this);
 		dialogFragment.show(getActivity().getSupportFragmentManager(),
 				TAG_DIALOG_ADD_TEXT);
 		return true;
 	}
 
-	private class AddTextDialogFragment extends DialogFragment implements
-			android.content.DialogInterface.OnClickListener {
-
-		public static final int TYPE_CREATE = 0;
-		public static final int TYPE_EDIT = 1;
-
-		private EditText editText;
-		private int type;
-		private String textToBeEdited;
-
-		public AddTextDialogFragment(int type, String textToBeEdited) {
-			this.type = type;
-			this.textToBeEdited = textToBeEdited;
-		}
-
-		public AddTextDialogFragment() {
-		}
-
-		@Override
-		public Dialog onCreateDialog(Bundle savedInstanceState) {
-			editText = new EditText(getActivity());
-			if (!TextUtils.isEmpty(textToBeEdited)) {
-				editText.setText(textToBeEdited);
-			}
-			return new AlertDialog.Builder(getActivity())
-					.setTitle(
-							type == TYPE_CREATE ? R.string.add_new_text_title
-									: R.string.edit_text_title)
-					.setPositiveButton(getString(android.R.string.ok), this)
-					.setNegativeButton(getString(android.R.string.cancel), null)
-					.setView(editText).create();
-		}
-
-		@Override
-		public void onClick(DialogInterface dialog, int position) {
-			String textToBeAdded = editText.getText().toString();
-			switch (type) {
-			case TYPE_CREATE:
-				addText(textToBeAdded);
-				break;
-			case TYPE_EDIT:
-				updateText(textToBeAdded);
-				break;
-			}
-			dialog.dismiss();
-		}
-
-		private void updateText(String textToBeAdded) {
-			if (textToBeAdded != null && !textToBeAdded.trim().isEmpty()
-					&& !CopiedApplication.clipboarStringsContain(textToBeAdded)) {
-				Log.i(TAG_LOG, "updating text: " + textToBeAdded);
-				CopiedApplication.replaceString(textToBeEdited, textToBeAdded);
-				adapter.clear();
-				adapter.addAll(CopiedApplication.getList());
-				adapter.notifyDataSetChanged();
-				CopiedApplication.setCurrentSelectedString(textToBeAdded);
-				sendCommandChangeNotif();
-			} else if (textToBeAdded != null && !textToBeAdded.trim().isEmpty()) {
-				Log.i(TAG_LOG, "update already exists: " + textToBeAdded);
-				Toast.makeText(getActivity(),
-						getString(R.string.text_already_exists),
-						Toast.LENGTH_LONG).show();
-			} else {
-				Log.i(TAG_LOG, "update empty");
-				Toast.makeText(getActivity(), getString(R.string.text_empty),
-						Toast.LENGTH_LONG).show();
-			}
-		}
-
-		private void addText(String textToBeAdded) {
-			if (textToBeAdded != null && !textToBeAdded.trim().isEmpty()
-					&& !CopiedApplication.clipboarStringsContain(textToBeAdded)) {
-				Log.i(TAG_LOG, "adding text: " + textToBeAdded);
-				adapter.add(textToBeAdded);
-				adapter.notifyDataSetChanged();
-				CopiedApplication.addStringToClipboard(textToBeAdded);
-				sendCommandCopy();
-			} else if (textToBeAdded != null && !textToBeAdded.trim().isEmpty()) {
-				Log.i(TAG_LOG, "already exists: " + textToBeAdded);
-				Toast.makeText(getActivity(),
-						getString(R.string.text_already_exists),
-						Toast.LENGTH_LONG).show();
-			} else {
-				Log.i(TAG_LOG, "empty");
-				Toast.makeText(getActivity(), getString(R.string.text_empty),
-						Toast.LENGTH_LONG).show();
-			}
-		}
-	}
-	
 	private class CutTextBroadcastReceiver extends BroadcastReceiver {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent != null && getString(R.string.action_cut_performed).equals(intent.getAction())) {
+			if (intent != null
+					&& getString(R.string.action_cut_performed).equals(
+							intent.getAction())) {
 				refreshList(false);
 			}
 		}
+	}
+
+	@Override
+	public void onTextUpdated() {
+		adapter.clear();
+		adapter.addAll(CopiedApplication.getList());
+		sendCommandChangeNotif();
+		adapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void onTextAdded(String textAdded) {
+		adapter.add(textAdded);
+		sendCommandCopy();
+		adapter.notifyDataSetChanged();
 	}
 }

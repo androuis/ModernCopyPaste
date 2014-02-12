@@ -1,7 +1,5 @@
 package com.andreibacalu.android.copied.activities;
 
-import java.util.HashSet;
-
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -18,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.andreibacalu.android.copied.R;
-import com.andreibacalu.android.copied.application.CopiedApplication;
 import com.andreibacalu.android.copied.fragments.CopiedTextsFragment;
 import com.andreibacalu.android.copied.fragments.SettingsFragment;
 import com.andreibacalu.android.copied.fragments.TutorialFragment;
