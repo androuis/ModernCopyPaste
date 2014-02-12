@@ -1,121 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="5dp" >
-
-    <!-- Notification settings -->
-    
-    <TextView
-        style="@style/settings_title"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_notification" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/black" />
-    
-    <CheckBox
-        android:id="@+id/settings_display_notification"
-        style="@style/settings_option"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_display_notificaion" />
-
-    <View
-        android:id="@+id/settings_display_notification_delimiter"
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@android:color/black" />
-
-    <CheckBox
-        android:id="@+id/settings_notification_no_clear"
-        style="@style/settings_option"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_notification_no_clear" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@android:color/black" />
-
-    <CheckBox
-        android:id="@+id/settings_notification_big_view"
-        style="@style/settings_option"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_notification_big_view" />
-
-    <View
-        android:id="@+id/settings_notification_big_view_delimiter"
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@android:color/black" />
-
-    <!-- Lyfecycle settings -->
-
-    <TextView
-        style="@style/settings_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_lifecycle" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/black" />
-
-    <CheckBox
-        android:id="@+id/settings_service_close_app"
-        style="@style/settings_option"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_service_close_with_app" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@android:color/black" />
-
-    <CheckBox
-        android:id="@+id/settings_service_start_at_boot"
-        style="@style/settings_option"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_service_start_at_boot" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@android:color/black" />
-
-    <!-- UI settings -->
-
-    <TextView
-        style="@style/settings_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_ui" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/black" />
-
-    <CheckBox
-        android:id="@+id/settings_display_toast"
-        style="@style/settings_option"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_display_toast" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@android:color/black" />
-
-</LinearLayout>
+        android:layout_height="match_parent">
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical"
+	    android:padding="5dp" >
+	
+	    <!-- Notification settings -->
+	    
+	    <TextView
+	        style="@style/settings_title"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_notification" />
+	
+	    <View
+	        android:layout_width="match_parent"
+	        android:layout_height="2dp"
+	        android:background="@android:color/black" />
+	    
+	    <CheckBox
+	        android:id="@+id/settings_display_notification"
+	        style="@style/settings_option"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_display_notificaion" />
+	
+	    <View
+	        android:id="@+id/settings_display_notification_delimiter"
+	        android:layout_width="match_parent"
+	        android:layout_height="0.5dp"
+	        android:background="@android:color/black" />
+	
+	    <CheckBox
+	        android:id="@+id/settings_notification_no_clear"
+	        style="@style/settings_option"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_notification_no_clear" />
+	
+	    <View
+	        android:layout_width="match_parent"
+	        android:layout_height="0.5dp"
+	        android:background="@android:color/black" />
+	
+	    <CheckBox
+	        android:id="@+id/settings_notification_big_view"
+	        style="@style/settings_option"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_notification_big_view" />
+	
+	    <View
+	        android:id="@+id/settings_notification_big_view_delimiter"
+	        android:layout_width="match_parent"
+	        android:layout_height="0.5dp"
+	        android:background="@android:color/black" />
+	
+	    <!-- Lyfecycle settings -->
+	
+	    <TextView
+	        style="@style/settings_title"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_lifecycle" />
+	
+	    <View
+	        android:layout_width="match_parent"
+	        android:layout_height="2dp"
+	        android:background="@android:color/black" />
+	
+	    <CheckBox
+	        android:id="@+id/settings_service_close_app"
+	        style="@style/settings_option"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_service_close_with_app" />
+	
+	    <View
+	        android:layout_width="match_parent"
+	        android:layout_height="0.5dp"
+	        android:background="@android:color/black" />
+	
+	    <CheckBox
+	        android:id="@+id/settings_service_start_at_boot"
+	        style="@style/settings_option"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_service_start_at_boot" />
+	
+	    <View
+	        android:layout_width="match_parent"
+	        android:layout_height="0.5dp"
+	        android:background="@android:color/black" />
+	
+	    <!-- UI settings -->
+	
+	    <TextView
+	        style="@style/settings_title"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_ui" />
+	
+	    <View
+	        android:layout_width="match_parent"
+	        android:layout_height="2dp"
+	        android:background="@android:color/black" />
+	
+	    <CheckBox
+	        android:id="@+id/settings_display_toast"
+	        style="@style/settings_option"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:text="@string/settings_display_toast" />
+	
+	    <View
+	        android:layout_width="match_parent"
+	        android:layout_height="0.5dp"
+	        android:background="@android:color/black" />
+	
+	</LinearLayout>
+</ScrollView>
