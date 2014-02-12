@@ -42,4 +42,7 @@
     <string name="edit_text_title">Edit selected text</string>
     
     <string name="action_cut_performed">com.andreibacalu.android.copied.CutPerformed</string>
+    
+    <!-- API keys -->
+    <string name="bugsense_api_key">2855c64c</string>
 </resources>

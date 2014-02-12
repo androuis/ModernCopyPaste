@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.andreibacalu.android.copied.R;
 import com.andreibacalu.android.copied.utils.SharedPreferencesUtil;
+import com.bugsense.trace.BugSenseHandler;
 
 import android.app.Application;
 import android.util.Log;
@@ -23,6 +25,7 @@ public class CopiedApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_api_key));
 		clipboardStrings = new ArrayList<String>(SharedPreferencesUtil.getInstance(getApplicationContext()).getTextsList());
 		currentSelectedString = clipboardStrings.size() == 0 ? "" : clipboardStrings.get(0);
 		instance = this;

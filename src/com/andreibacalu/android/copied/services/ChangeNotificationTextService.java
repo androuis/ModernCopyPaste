@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.andreibacalu.android.copied.R;
 import com.andreibacalu.android.copied.activities.MainActivity;
+import com.andreibacalu.android.copied.activities.TransparentActivity;
 import com.andreibacalu.android.copied.application.CopiedApplication;
 import com.andreibacalu.android.copied.utils.SharedPreferencesUtil;
 
@@ -246,9 +247,9 @@ public class ChangeNotificationTextService extends Service {
 						new NotificationCompat.BigTextStyle()
 								.bigText(textString));
 		
-		Intent intent = new Intent(this, ChangeNotificationTextService.class);
+		Intent intent = new Intent(this, MainActivity.class);
 		intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_OPEN_ACTIVITY);
-		PendingIntent pIntentOpenActivity = PendingIntent.getService(getBaseContext(),
+		PendingIntent pIntentOpenActivity = PendingIntent.getActivity(getBaseContext(),
 				INTENT_COMMAND_TYPE_OPEN_ACTIVITY, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -275,14 +276,11 @@ public class ChangeNotificationTextService extends Service {
 
 		PendingIntent pIntentCopy = null;
 		if (!textString.contains(CopiedApplication.DEFAULT_STRING)) {
-			intent = new Intent(this, ChangeNotificationTextService.class);
+			intent = new Intent(this, TransparentActivity.class);
 			intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_COPY);
-			pIntentCopy = PendingIntent.getService(getBaseContext(),
+			pIntentCopy = PendingIntent.getActivity(getBaseContext(),
 					INTENT_COMMAND_TYPE_COPY, intent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
-
-			intent = new Intent(this, ChangeNotificationTextService.class);
-			intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_CUT);
 		}
 
 		if (CopiedApplication.getNumberOfTextsInClipboard() >= 2) {
@@ -314,9 +312,9 @@ public class ChangeNotificationTextService extends Service {
 								+ " "
 								+ getString(R.string.clipdata_not_listening_for_changes));
 
-		Intent intent = new Intent(this, ChangeNotificationTextService.class);
+		Intent intent = new Intent(this, MainActivity.class);
 		intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_OPEN_ACTIVITY);
-		PendingIntent pIntent = PendingIntent.getService(getBaseContext(),
+		PendingIntent pIntent = PendingIntent.getActivity(getBaseContext(),
 				INTENT_COMMAND_TYPE_OPEN_ACTIVITY, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		rv.setOnClickPendingIntent(R.id.notification_layout_parent, pIntent);
