@@ -13,6 +13,10 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowClearUserData="false"
         android:icon="@drawable/ic_launcher"
@@ -42,6 +46,9 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="44335ba78e4158179a74cc3d3ebcc8de6788e680"/>
+        
     </application>
 
 </manifest>

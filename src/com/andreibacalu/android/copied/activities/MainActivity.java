@@ -1,5 +1,8 @@
 package com.andreibacalu.android.copied.activities;
 
+import com.crashlytics.android.Crashlytics;
+import java.util.HashSet;
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -37,6 +40,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Crashlytics.start(this);
 		setContentView(R.layout.activity_main);
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		menuOptions = getResources().getStringArray(
