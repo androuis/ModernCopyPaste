@@ -1,6 +1,5 @@
 package com.andreibacalu.android.copied.services;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import android.app.Notification;
@@ -44,6 +43,8 @@ public class ChangeNotificationTextService extends Service {
 	private ClipboardManager clipBoard;
 	private ClipboardListener clipBoardListener;
 	private NotificationManager notificationManager;
+	
+	private Intent cutPerformedIntent;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -53,9 +54,7 @@ public class ChangeNotificationTextService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		CopiedApplication.replaceList(new ArrayList<String>(
-				SharedPreferencesUtil.getInstance(getApplicationContext())
-						.getTextsList()));
+		cutPerformedIntent = new Intent(getString(R.string.action_cut_performed));
 		clipBoard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 		if (Integer.valueOf(android.os.Build.VERSION.SDK) != 18) {
 			clipBoardListener = new ClipboardListener();
@@ -67,8 +66,6 @@ public class ChangeNotificationTextService extends Service {
 
 	@Override
 	public void onDestroy() {
-		SharedPreferencesUtil.getInstance(getApplicationContext())
-				.setTextsList(new HashSet<String>(CopiedApplication.getList()));
 		notificationManager.cancelAll();
 		notificationManager = null;
 		clipBoard.removePrimaryClipChangedListener(clipBoardListener);
@@ -110,7 +107,7 @@ public class ChangeNotificationTextService extends Service {
 			} catch (Exception e) {
 				Log.e(TAG_LOG, e.getMessage());
 			}
-			notificationManager.cancelAll();
+			createNotif(CopiedApplication.getCurrentSelectedString(), true);
 			clipBoard.addPrimaryClipChangedListener(clipBoardListener);
 			displayAddedToClipboardToast();
 			break;
@@ -138,6 +135,7 @@ public class ChangeNotificationTextService extends Service {
 			} else {
 				createNotif(CopiedApplication.getCurrentSelectedString(), true);
 			}
+			sendBroadcast(cutPerformedIntent);
 			clipBoard.addPrimaryClipChangedListener(clipBoardListener);
 			displayAddedToClipboardToast();
 			break;
@@ -303,16 +301,7 @@ public class ChangeNotificationTextService extends Service {
 		
 		Notification notification = notificationBuilder.setContentIntent(pIntentOpenActivity)
 				.build();
-		if (Integer.valueOf(android.os.Build.VERSION.SDK) >= 16) {
-			notification.priority = SharedPreferencesUtil.getInstance(
-					getApplicationContext()).getSetting(
-					SharedPreferencesUtil.SETTING_DISPLAY_NOTIFICATION) ? Notification.PRIORITY_DEFAULT
-					: Notification.PRIORITY_MIN;
-		}
-		if (SharedPreferencesUtil.getInstance(getApplicationContext()).getSetting(SharedPreferencesUtil.SETTING_NOTIFICATION_NO_CLEAR)) {
-			notification.flags |= Notification.FLAG_NO_CLEAR;
-		}
-		notificationManager.notify(NOTIFICATION_ID, notification);
+		completeAndShowNotification(notification);
 	}
 
 	private void createNormalNotification(String textString) {
@@ -396,6 +385,10 @@ public class ChangeNotificationTextService extends Service {
 		// Build notification
 		Notification notification = new NotificationCompat.Builder(this)
 				.setContent(rv).setSmallIcon(R.drawable.ic_launcher).build();
+		completeAndShowNotification(notification);
+	}
+
+	private void completeAndShowNotification(Notification notification) {
 		if (Integer.valueOf(android.os.Build.VERSION.SDK) >= 16) {
 			notification.priority = SharedPreferencesUtil.getInstance(
 					getApplicationContext()).getSetting(

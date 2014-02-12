@@ -126,7 +126,6 @@ public class MainActivity extends FragmentActivity {
     	if (SharedPreferencesUtil.getInstance(getApplicationContext()).getSetting(SharedPreferencesUtil.SETTING_SERVICE_CLOSE)) {
     		getBaseContext().stopService(serviceIntent);
     	}
-    	SharedPreferencesUtil.getInstance(getApplicationContext()).setTextsList(new HashSet<String>(CopiedApplication.getList()));
     	super.onDestroy();
     }
 

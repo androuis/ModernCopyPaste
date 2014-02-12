@@ -5,8 +5,11 @@ import java.util.List;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -39,17 +42,19 @@ public class CopiedTextsFragment extends Fragment implements
 
 	private CopiedTextsAdapter adapter;
 	private ListView listView;
-	private boolean isFirstLaunch;
+	private CutTextBroadcastReceiver cutTextBroadcastReceiver;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		Log.e(TAG_LOG, "onCreateView");
 		return inflater.inflate(R.layout.activity_list_view, container, false);
 	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		Log.e(TAG_LOG, "onViewCreated");
 		listView = (ListView) view.findViewById(R.id.listview);
 		// Create a ListView-specific touch listener. ListViews are given
 		// special treatment because
@@ -100,17 +105,15 @@ public class CopiedTextsFragment extends Fragment implements
 					}
 				});
 		
-		refreshList(true);
-		isFirstLaunch = true;
+		refreshList(false);
+		cutTextBroadcastReceiver = new CutTextBroadcastReceiver();
+		getActivity().registerReceiver(cutTextBroadcastReceiver, new IntentFilter(getString(R.string.action_cut_performed)));
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		if (!isFirstLaunch) {
-			refreshList(false);
-		}
-		isFirstLaunch = false;
+	public void onDestroyView() {
+		super.onDestroyView();
+		getActivity().unregisterReceiver(cutTextBroadcastReceiver);
 	}
 
 	private void refreshList(boolean withCheck) {
@@ -260,6 +263,16 @@ public class CopiedTextsFragment extends Fragment implements
 				Log.i(TAG_LOG, "empty");
 				Toast.makeText(getActivity(), getString(R.string.text_empty),
 						Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+	
+	private class CutTextBroadcastReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null && getString(R.string.action_cut_performed).equals(intent.getAction())) {
+				refreshList(false);
 			}
 		}
 	}

@@ -1,7 +1,10 @@
 package com.andreibacalu.android.copied.application;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+
+import com.andreibacalu.android.copied.utils.SharedPreferencesUtil;
 
 import android.app.Application;
 import android.util.Log;
@@ -12,8 +15,18 @@ public class CopiedApplication extends Application {
 	
 	public final static String DEFAULT_STRING = "You have no copied data yet.";
 	
-	private static List<String> clipboardStrings = new ArrayList<String>();
-	private static String currentSelectedString = "";
+	private static List<String> clipboardStrings;
+	private static String currentSelectedString;
+	
+	private static CopiedApplication instance;
+	
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		clipboardStrings = new ArrayList<String>(SharedPreferencesUtil.getInstance(getApplicationContext()).getTextsList());
+		currentSelectedString = clipboardStrings.size() == 0 ? "" : clipboardStrings.get(0);
+		instance = this;
+	}
 	
 	public static String getCurrentSelectedString() {
 		if (clipboardStrings.size() > 0) {
@@ -38,11 +51,13 @@ public class CopiedApplication extends Application {
 	public static void addStringToClipboard(String string) {
 		clipboardStrings.add(string);
 		currentSelectedString = string;
+		SharedPreferencesUtil.getInstance(instance).setTextsList(new HashSet<String>(clipboardStrings));
 	}
 	
 	public static int removeStringFromClipboard(String string) {
 		int stringLocation = clipboardStrings.indexOf(string);
 		clipboardStrings.remove(string);
+		SharedPreferencesUtil.getInstance(instance).setTextsList(new HashSet<String>(clipboardStrings));
 		return stringLocation;
 	}
 	
@@ -75,6 +90,7 @@ public class CopiedApplication extends Application {
 	public static void replaceString(String oldString, String newString) {
 		if (clipboardStrings.indexOf(oldString) > -1) {
 			clipboardStrings.set(clipboardStrings.indexOf(oldString), newString);
+			SharedPreferencesUtil.getInstance(instance).setTextsList(new HashSet<String>(clipboardStrings));
 		}
 	}
 }
