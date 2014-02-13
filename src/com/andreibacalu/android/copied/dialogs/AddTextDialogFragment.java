@@ -25,6 +25,8 @@ public class AddTextDialogFragment extends DialogFragment implements
 			.getSimpleName();
 
 	private final String EXTRA_INPUTED_TEXT = "extra_inputed_text";
+	private final String EXTRA_INPUTED_TEXT_CURSOR_START = "extra_inputed_text_cursor_start";
+	private final String EXTRA_INPUTED_TEXT_CURSOR_END = "extra_inputed_text_cursor_end";
 	private final String EXTRA_EDITABLE_TEXT = "extra_editable_text";
 	private final String EXTRA_TYPE_DIALOG = "extra_type_dialog";
 
@@ -62,8 +64,16 @@ public class AddTextDialogFragment extends DialogFragment implements
 			type = savedInstanceState.getInt(EXTRA_TYPE_DIALOG);
 			editText.setText(savedInstanceState.getString(EXTRA_INPUTED_TEXT,
 					""));
+			int cursorStart = savedInstanceState.getInt(EXTRA_INPUTED_TEXT_CURSOR_START);
+			int cursorEnd = savedInstanceState.getInt(EXTRA_INPUTED_TEXT_CURSOR_END);
+			if (cursorStart == cursorEnd) {
+				editText.setSelection(cursorStart);
+			} else {
+				editText.setSelection(cursorStart, cursorEnd);
+			}
 		} else if (!TextUtils.isEmpty(textToBeEdited)) {
 			editText.setText(textToBeEdited);
+			editText.setSelection(textToBeEdited.length());
 		}
 		return new AlertDialog.Builder(getActivity())
 				.setTitle(
@@ -93,6 +103,8 @@ public class AddTextDialogFragment extends DialogFragment implements
 		arg0.putString(EXTRA_INPUTED_TEXT, editText.getText().toString());
 		arg0.putString(EXTRA_EDITABLE_TEXT, textToBeEdited);
 		arg0.putInt(EXTRA_TYPE_DIALOG, type);
+		arg0.putInt(EXTRA_INPUTED_TEXT_CURSOR_START, editText.getSelectionStart());
+		arg0.putInt(EXTRA_INPUTED_TEXT_CURSOR_END, editText.getSelectionEnd());
 	}
 
 	private void updateText(String textToBeAdded) {
