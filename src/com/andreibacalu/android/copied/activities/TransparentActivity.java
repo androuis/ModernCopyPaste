@@ -1,10 +1,11 @@
 package com.andreibacalu.android.copied.activities;
 
-import com.andreibacalu.android.copied.R;
-
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+
+import com.andreibacalu.android.copied.R;
+import com.andreibacalu.android.copied.services.ChangeNotificationTextService;
 
 public class TransparentActivity extends Activity {
 
@@ -12,17 +13,14 @@ public class TransparentActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_transparent);
+		handleIntent(getIntent());
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-		new Handler().postDelayed(new Runnable() {
-
-			@Override
-			public void run() {
-				finish();
-			}
-		}, 200);
+	private void handleIntent(Intent intent) {
+		if (intent != null) {
+			intent.setClass(this, ChangeNotificationTextService.class);
+			startService(intent);
+			finish();
+		}
 	}
 }

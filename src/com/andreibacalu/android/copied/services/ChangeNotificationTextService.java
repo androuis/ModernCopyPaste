@@ -36,7 +36,7 @@ public class ChangeNotificationTextService extends Service {
 	public final static int INTENT_COMMAND_TYPE_OPEN_ACTIVITY = 11;
 	public final static int INTENT_COMMAND_TYPE_REMOVE = 12;
 
-	private final int NOTIFICATION_ID = 0;
+	public final static int NOTIFICATION_ID = 0;
 	private final int MAX_TOAST_TEXT_LENGHT = 50;
 
 	private ClipboardManager clipBoard;
@@ -272,6 +272,11 @@ public class ChangeNotificationTextService extends Service {
 			PendingIntent pIntent = PendingIntent.getService(getBaseContext(),
 					INTENT_COMMAND_TYPE_API_18_ERROR_CASE, intent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
+
+			Notification notification = notificationBuilder.setContentIntent(pIntent)
+					.build();
+			completeAndShowNotification(notification);
+			return;
 		}
 
 		PendingIntent pIntentCopy = null;
@@ -294,7 +299,7 @@ public class ChangeNotificationTextService extends Service {
 			notificationBuilder
 				.addAction(0, getString(R.string.copy), pIntentCopy);
 		}
-		
+
 		Notification notification = notificationBuilder.setContentIntent(pIntentOpenActivity)
 				.build();
 		completeAndShowNotification(notification);
@@ -344,16 +349,16 @@ public class ChangeNotificationTextService extends Service {
 		}
 
 		if (!textString.contains(CopiedApplication.DEFAULT_STRING)) {
-			intent = new Intent(this, ChangeNotificationTextService.class);
+			intent = new Intent(this, TransparentActivity.class);
 			intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_COPY);
-			pIntent = PendingIntent.getService(getBaseContext(),
+			pIntent = PendingIntent.getActivity(getBaseContext(),
 					INTENT_COMMAND_TYPE_COPY, intent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
 			rv.setOnClickPendingIntent(R.id.text_copy, pIntent);
 
-			intent = new Intent(this, ChangeNotificationTextService.class);
+			intent = new Intent(this, TransparentActivity.class);
 			intent.putExtra(INTENT_COMMAND_TYPE, INTENT_COMMAND_TYPE_CUT);
-			pIntent = PendingIntent.getService(getBaseContext(),
+			pIntent = PendingIntent.getActivity(getBaseContext(),
 					INTENT_COMMAND_TYPE_CUT, intent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
 			rv.setOnClickPendingIntent(R.id.text_cut, pIntent);
