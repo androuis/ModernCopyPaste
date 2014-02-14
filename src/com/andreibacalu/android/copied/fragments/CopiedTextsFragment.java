@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,8 @@ public class CopiedTextsFragment extends Fragment implements
 	private ListView listView;
 	private CutTextBroadcastReceiver cutTextBroadcastReceiver;
 	private AddTextDialogFragment dialogFragment;
+	
+	private Context context;
 
 	public CopiedTextsFragment() {
 	}
@@ -55,6 +58,7 @@ public class CopiedTextsFragment extends Fragment implements
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		Log.e(TAG_LOG, "onViewCreated");
+		context = view.getContext();
 		listView = (ListView) view.findViewById(R.id.listview);
 		// Create a ListView-specific touch listener. ListViews are given
 		// special treatment because
@@ -99,7 +103,7 @@ public class CopiedTextsFragment extends Fragment implements
 					@Override
 					public void onClick(View v) {
 						dialogFragment = new AddTextDialogFragment(AddTextDialogFragment.TYPE_CREATE, "", CopiedTextsFragment.this);
-						dialogFragment.show(getActivity()
+						dialogFragment.show(((FragmentActivity)context)
 								.getSupportFragmentManager(),
 								TAG_DIALOG_ADD_TEXT);
 					}
@@ -107,21 +111,23 @@ public class CopiedTextsFragment extends Fragment implements
 
 		refreshList(false);
 		cutTextBroadcastReceiver = new CutTextBroadcastReceiver();
-		getActivity().registerReceiver(cutTextBroadcastReceiver,
+		context.registerReceiver(cutTextBroadcastReceiver,
 				new IntentFilter(getString(R.string.action_cut_performed)));
 
 		if (savedInstanceState != null) {
-			dialogFragment = (AddTextDialogFragment) getActivity().getSupportFragmentManager().findFragmentByTag(TAG_DIALOG_ADD_TEXT);
+			dialogFragment = (AddTextDialogFragment) ((FragmentActivity)context).getSupportFragmentManager().findFragmentByTag(TAG_DIALOG_ADD_TEXT);
 			if (dialogFragment != null) {
 				dialogFragment.setListener(this);
 			}
 		}
+		Log.e(TAG_LOG, "context: " + context);
 	}
 
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		getActivity().unregisterReceiver(cutTextBroadcastReceiver);
+		Log.e(TAG_LOG, "onDestroyView");
+		context.unregisterReceiver(cutTextBroadcastReceiver);
 	}
 
 	private void refreshList(boolean withCheck) {
@@ -129,39 +135,39 @@ public class CopiedTextsFragment extends Fragment implements
 		if (withCheck) {
 			textsList = CopiedApplication.getNumberOfTextsInClipboard() > 0 ? textsList
 					: new ArrayList<String>(SharedPreferencesUtil.getInstance(
-							getActivity().getApplicationContext())
+							context.getApplicationContext())
 							.getTextsList());
 		}
-		adapter = new CopiedTextsAdapter(getActivity(),
+		adapter = new CopiedTextsAdapter(context,
 				android.R.layout.simple_list_item_1, android.R.id.text1,
 				textsList);
 		listView.setAdapter(adapter);
 	}
 
 	private void sendCommandChangeNotif() {
-		Intent intent = new Intent(getActivity().getBaseContext(),
+		Intent intent = new Intent(context,
 				ChangeNotificationTextService.class);
 		intent.putExtra(ChangeNotificationTextService.INTENT_COMMAND_TYPE,
 				ChangeNotificationTextService.INTENT_COMMAND_TYPE_CHANGE_NOTIF);
-		getActivity().getBaseContext().startService(intent);
+		context.startService(intent);
 	}
 
 	private void sendCommandCopy() {
-		Intent intent = new Intent(getActivity().getBaseContext(),
+		Intent intent = new Intent(context,
 				ChangeNotificationTextService.class);
 		intent.putExtra(ChangeNotificationTextService.INTENT_COMMAND_TYPE,
 				ChangeNotificationTextService.INTENT_COMMAND_TYPE_COPY);
-		getActivity().getBaseContext().startService(intent);
+		context.startService(intent);
 	}
 
 	private void sendCommandRemove(int position) {
-		Intent intent = new Intent(getActivity().getBaseContext(),
+		Intent intent = new Intent(context,
 				ChangeNotificationTextService.class);
 		intent.putExtra(ChangeNotificationTextService.INTENT_COMMAND_TYPE,
 				ChangeNotificationTextService.INTENT_COMMAND_TYPE_REMOVE);
 		intent.putExtra(ChangeNotificationTextService.INTENT_REMOVE_POSITION,
 				position);
-		getActivity().getBaseContext().startService(intent);
+		context.startService(intent);
 	}
 
 	@Override
@@ -182,7 +188,7 @@ public class CopiedTextsFragment extends Fragment implements
 		dialogFragment = new AddTextDialogFragment(
 				AddTextDialogFragment.TYPE_EDIT, adapter.getItem(position),
 				this);
-		dialogFragment.show(getActivity().getSupportFragmentManager(),
+		dialogFragment.show(((FragmentActivity)context).getSupportFragmentManager(),
 				TAG_DIALOG_ADD_TEXT);
 		return true;
 	}

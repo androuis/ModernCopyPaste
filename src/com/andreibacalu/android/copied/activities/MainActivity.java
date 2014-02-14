@@ -37,9 +37,12 @@ public class MainActivity extends FragmentActivity {
 
 	private Intent serviceIntent;
 
+	private boolean isActivityJustCreated;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.e(TAG_LOG, "onCreate");
 		Crashlytics.start(this);
 		setContentView(R.layout.activity_main);
 		drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -79,22 +82,25 @@ public class MainActivity extends FragmentActivity {
 		if (savedInstanceState == null) {
 			selectItem(0);
 		}
+		isActivityJustCreated = true;
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.e(TAG_LOG, "onResume");
 		serviceIntent = new Intent(getBaseContext(),
 				ChangeNotificationTextService.class);
 		getBaseContext().startService(serviceIntent);
 		Intent intent = getIntent();
-		if (intent != null) {
+		if (intent != null && !isActivityJustCreated) {
 			int command = intent.getIntExtra(ChangeNotificationTextService.INTENT_COMMAND_TYPE,
 					ChangeNotificationTextService.INTENT_COMMAND_TYPE_UNKNOWN);
 			if (command == ChangeNotificationTextService.INTENT_COMMAND_TYPE_OPEN_ACTIVITY) {
 				selectItem(0);
 			}
 		}
+		isActivityJustCreated = false;
 	}
 	
 	@Override
