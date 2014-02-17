@@ -86,7 +86,7 @@ public class AddTextDialogFragment extends DialogFragment implements
 
 	@Override
 	public void onClick(DialogInterface dialog, int position) {
-		String textToBeAdded = editText.getText().toString();
+		String textToBeAdded = editText.getText().toString().trim();
 		switch (type) {
 		case TYPE_CREATE:
 			addText(textToBeAdded);
