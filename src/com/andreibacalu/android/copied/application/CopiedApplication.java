@@ -90,10 +90,12 @@ public class CopiedApplication extends Application {
 		setCurrentSelectedString(clipboardStrings.size() > 0 ? clipboardStrings.get(0) : DEFAULT_STRING);
 	}
 	
-	public static void replaceString(String oldString, String newString) {
+	public static boolean replaceString(String oldString, String newString) {
 		if (clipboardStrings.indexOf(oldString) > -1) {
 			clipboardStrings.set(clipboardStrings.indexOf(oldString), newString);
 			SharedPreferencesUtil.getInstance(instance).setTextsList(new HashSet<String>(clipboardStrings));
+			return true;
 		}
+		return false;
 	}
 }

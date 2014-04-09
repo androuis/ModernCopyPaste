@@ -111,9 +111,12 @@ public class AddTextDialogFragment extends DialogFragment implements
 		if (textToBeAdded != null && !textToBeAdded.trim().isEmpty()
 				&& !CopiedApplication.clipboarStringsContain(textToBeAdded)) {
 			Log.i(TAG_LOG, "updating text: " + textToBeAdded);
-			CopiedApplication.replaceString(textToBeEdited, textToBeAdded);
-			CopiedApplication.setCurrentSelectedString(textToBeAdded);
-			listener.onTextUpdated();
+			if (CopiedApplication.replaceString(textToBeEdited, textToBeAdded)) {
+				CopiedApplication.setCurrentSelectedString(textToBeAdded);
+				listener.onTextUpdated();
+			} else {
+				addText(textToBeAdded);
+			}
 		} else if (textToBeAdded != null && !textToBeAdded.trim().isEmpty()) {
 			Log.i(TAG_LOG, "update already exists: " + textToBeAdded);
 			Toast.makeText(getActivity(),
